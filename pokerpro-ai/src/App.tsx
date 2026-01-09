@@ -127,7 +127,7 @@ const HUDOverlay = ({ pokerState }: { pokerState: PokerState }) => {
 
 const AudioVisualizer = ({ analyser, isActive, label }: { analyser: AnalyserNode | null, isActive: boolean, label: string }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const animationRef = useRef<number>();
+  const animationRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     if (!canvasRef.current || !analyser || !isActive) return;
@@ -323,7 +323,7 @@ export default function App() {
       processorRef.current.onaudioprocess = (e) => {
         if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) return;
         const resampled = resampleTo16kHz(e.inputBuffer.getChannelData(0), audioContextRef.current!.sampleRate);
-        wsRef.current.send(JSON.stringify({ realtimeInput: { mediaChunks: [{ mimeType: 'audio/pcm;rate=16000', data: arrayBufferToBase64(resampled.buffer) }] } }));
+        wsRef.current.send(JSON.stringify({ realtimeInput: { mediaChunks: [{ mimeType: 'audio/pcm;rate=16000', data: arrayBufferToBase64(resampled.buffer as ArrayBuffer) }] } }));
       };
       setIsMicActive(true);
       addTranscript('🎤 Microfono attivo');
